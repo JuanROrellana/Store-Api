@@ -14,7 +14,10 @@ use Illuminate\Http\Request;
 */
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 Route::get('products/{title?}/{likes?}', 'ProductController@index');
 Route::get('products/{product}', 'ProductController@show');
 Route::post('products', 'ProductController@store');
