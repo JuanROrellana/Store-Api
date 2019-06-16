@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Product;
+use App\LoggingInfo;
 use Log;
 use Illuminate\Support\Facades\DB;
 
@@ -11,8 +12,6 @@ class ProductController extends Controller
 {
     public function index($name = null)
     {
-        // $current_user = auth()->guard('api')->user();
-        // return response($current_user, 200)->header('Content-Type', 'application/json');
         if ($name != null) {
             $products = DB::table('products')->where('name', '=', $name)->orderBy('name', 'ASC')->paginate(10);
             return response($products, 200)->header('Content-Type', 'application/json');
