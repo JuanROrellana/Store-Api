@@ -9,16 +9,15 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index($title = null, $likes = null)
+    public function index($name = null)
     {
-        $products = DB::table('products')->paginate(10);
-        if ($title != null) {
-            if ($likes != null) {
-                $products = DB::table('products')->where('title', '=', $title)->where('likes', '=', $likes)->paginate(10);
-            } else {
-                $products = DB::table('products')->where('title', '=', $title)->paginate(10);
-            }
+        // $current_user = auth()->guard('api')->user();
+        // return response($current_user, 200)->header('Content-Type', 'application/json');
+        if ($name != null) {
+            $products = DB::table('products')->where('name', '=', $name)->orderBy('name', 'ASC')->paginate(10);
+            return response($products, 200)->header('Content-Type', 'application/json');
         }
+        $products = DB::table('products')->orderBy('name', 'ASC')->paginate(10);
         return response($products, 200)->header('Content-Type', 'application/json');
     }
 
@@ -59,6 +58,23 @@ class ProductController extends Controller
             $product->update($request->all());
             Log::info("Product Update" . $request);
             return response("", 202)->header('Content-Type', 'application/json');
+        } catch (\Exception $ex) {
+            Log::error($ex);
+            return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
+        }
+    }
+
+    public function like($id)
+    {
+        try {
+            $product = Product::find($id);
+            if ($product == null) {
+                return response("", 404)->header('Content-Type', 'application/json');
+            }
+            $product->likes = $product->likes + 1;
+            $product->save();
+            Log::info("Product $id Like");
+            return response("", 204)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
