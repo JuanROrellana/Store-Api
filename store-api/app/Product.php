@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
-  protected $fillable = ['title', 'description', 'code', 'quantity', 'price', 'likes'];
+  protected $fillable = ['name', 'description', 'code', 'quantity', 'price', 'likes'];
 
   public function orderItems()
   {
