@@ -13,14 +13,17 @@ use Illuminate\Http\Request;
 |
 */
 
+//Products Functionality
 Route::get('products/{name?}', 'ProductController@index');
 Route::get('products/like/{id}', 'ProductController@like')->middleware('auth:api');
 Route::post('products', 'ProductController@store')->middleware('auth:api');
 Route::put('products/{product}', 'ProductController@update')->middleware('auth:api');
 Route::delete('products/{id}', 'ProductController@delete')->middleware('auth:api');
 
+//Buy a product
 Route::post('order', 'OrderController@buy')->middleware('auth:api');
 
+//Passport Authentication
 Route::group([
     'prefix' => 'auth'
 ], function () {

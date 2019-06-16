@@ -23,8 +23,8 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $product = Product::create($request->all())->id;
-            return response("Product Created with id $product", 201)->header('Content-Type', 'application/json');
+            $product = Product::create($request->all());
+            return response("", 201)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
@@ -40,7 +40,7 @@ class ProductController extends Controller
             }
             $product->delete();
 
-            return response("", 204)->header('Content-Type', 'application/json');
+            return response("", 202)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
@@ -55,7 +55,18 @@ class ProductController extends Controller
                 return response("", 404)->header('Content-Type', 'application/json');
             }
             $product->update($request->all());
-            Log::info("Product Update " . $request);
+
+            //Save Log Data
+            $log_data = "Controller ProductController. Action update. Data: $request";
+            Log::info($log_data);
+            $log_info = new LoggingInfo();
+            $log_info->user_id = auth()->guard('api')->user()->id;
+            $log_info->title = "Product Update";
+            $log_info->description = "";
+            $log_info->data = $log_data;
+            $log_info->save();
+            Log::info($log_data);
+
             return response("", 202)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
@@ -74,7 +85,7 @@ class ProductController extends Controller
             $product->save();
             $user = auth()->guard('api')->user()->id;
             Log::info("Product $id Like by User with Id: $user");
-            return response("", 204)->header('Content-Type', 'application/json');
+            return response("", 202)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');

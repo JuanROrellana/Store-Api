@@ -12,9 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    //Buy a product
-    //Buying a product should reduce its stock.
-    //Keep a log of all the purchases (who bought it, how many, when).
+    /**
+     * Buy Products
+     *
+     * In addition, it is set as the URL generator's root namespace.
+     *
+     * @var string
+     */
     public function buy(Request $request)
     {
         try {
@@ -46,6 +50,7 @@ class OrderController extends Controller
                     return response("Not enough quantity to deliver. Current Quantity $product->quantity", 404)->header('Content-Type', 'application/json');
                 }
 
+                $order->save();
                 //Insert Order Items
                 $order_item = new OrderItem();
                 $order_item->quantity = $quantity;
@@ -57,19 +62,22 @@ class OrderController extends Controller
 
                 //Save Data
                 $order_item->save();
-                $order->save();
                 $product->save();
 
+                //Save Log Data
                 $log_data = "Controller OrderController. Action buy. BuyId: $order->id, ProductId: $product_id, User: $order->user_id, Quantity: $quantity";
                 Log::info($log_data);
-
-
-
+                $log_info = new LoggingInfo();
+                $log_info->user_id = $order->user_id;
+                $log_info->title = "Inserted new Order";
+                $log_info->description = "";
+                $log_info->data = $log_data;
+                $log_info->save();
             }
             return response("Order Placed with Id $order->id", 200)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
-            return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
+            return response("$ex", 400)->header('Content-Type', 'application/json');
         }
     }
 }
