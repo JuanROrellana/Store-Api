@@ -55,7 +55,7 @@ class ProductController extends Controller
                 return response("", 404)->header('Content-Type', 'application/json');
             }
             $product->update($request->all());
-            Log::info("Product Update" . $request);
+            Log::info("Product Update " . $request);
             return response("", 202)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
@@ -72,7 +72,8 @@ class ProductController extends Controller
             }
             $product->likes = $product->likes + 1;
             $product->save();
-            Log::info("Product $id Like");
+            $user = auth()->guard('api')->user()->id;
+            Log::info("Product $id Like by User with Id: $user");
             return response("", 204)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
