@@ -7,6 +7,7 @@ use App\Product;
 use App\LoggingInfo;
 use Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
@@ -23,8 +24,12 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $product = Product::create($request->all());
-            return response("", 201)->header('Content-Type', 'application/json');
+            if (Gate::allows('admin-only', auth()->user())) {
+                Product::create($request->all());
+                return response("", 201)->header('Content-Type', 'application/json');
+            }
+
+            return response("Only Administrator Users can Access this Resource", 405)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
@@ -34,13 +39,17 @@ class ProductController extends Controller
     public function delete($id)
     {
         try {
-            $product = Product::find($id);
-            if ($product == null) {
-                return response("", 404)->header('Content-Type', 'application/json');
-            }
-            $product->delete();
+            if (Gate::allows('admin-only', auth()->user())) {
+                $product = Product::find($id);
+                if ($product == null) {
+                    return response("", 404)->header('Content-Type', 'application/json');
+                }
+                $product->delete();
 
-            return response("", 202)->header('Content-Type', 'application/json');
+                return response("", 202)->header('Content-Type', 'application/json');
+            }
+
+            return response("Only Administrator Users can Access this Resource", 405)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
@@ -50,24 +59,28 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $product = Product::find($id);
-            if ($product == null) {
-                return response("", 404)->header('Content-Type', 'application/json');
+            if (Gate::allows('admin-only', auth()->user())) {
+                $product = Product::find($id);
+                if ($product == null) {
+                    return response("", 404)->header('Content-Type', 'application/json');
+                }
+                $product->update($request->all());
+
+                //Save Log Data
+                $log_data = "Controller ProductController. Action update. Data: $request";
+                Log::info($log_data);
+                $log_info = new LoggingInfo();
+                $log_info->user_id = auth()->guard('api')->user()->id;
+                $log_info->title = "Product Update";
+                $log_info->description = "";
+                $log_info->data = $log_data;
+                $log_info->save();
+                Log::info($log_data);
+
+                return response("", 202)->header('Content-Type', 'application/json');
             }
-            $product->update($request->all());
 
-            //Save Log Data
-            $log_data = "Controller ProductController. Action update. Data: $request";
-            Log::info($log_data);
-            $log_info = new LoggingInfo();
-            $log_info->user_id = auth()->guard('api')->user()->id;
-            $log_info->title = "Product Update";
-            $log_info->description = "";
-            $log_info->data = $log_data;
-            $log_info->save();
-            Log::info($log_data);
-
-            return response("", 202)->header('Content-Type', 'application/json');
+            return response("Only Administrator Users can Access this Resource", 405)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
             return response($ex->getMessage(), 400)->header('Content-Type', 'application/json');
