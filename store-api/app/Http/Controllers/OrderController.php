@@ -15,9 +15,8 @@ class OrderController extends Controller
     /**
      * Buy Products
      *
-     * In addition, it is set as the URL generator's root namespace.
-     *
-     * @var string
+     * @param Request $request
+     * @return Response|string
      */
     public function buy(Request $request)
     {
@@ -33,7 +32,6 @@ class OrderController extends Controller
             $order = new Order();
             $order->comments = "First Order";
             $order->user_id = auth()->guard('api')->user()->id;
-
 
             foreach ($order_items as $item) {
                 $product_id = $item['product_id'];
@@ -74,10 +72,11 @@ class OrderController extends Controller
                 $log_info->data = $log_data;
                 $log_info->save();
             }
-            return response("Order Placed with Id $order->id", 200)->header('Content-Type', 'application/json');
+            
+            return response("", 201)->header('Content-Type', 'application/json');
         } catch (\Exception $ex) {
             Log::error($ex);
-            return response("$ex", 400)->header('Content-Type', 'application/json');
+            return response("$ex->getMessage()", 400)->header('Content-Type', 'application/json');
         }
     }
 }

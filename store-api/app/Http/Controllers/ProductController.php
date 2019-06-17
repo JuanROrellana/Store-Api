@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
+    /**
+     * Display and Search Product by name
+     *
+     * @param string $name
+     * @return List|Product
+     */
     public function index($name = null)
     {
         if ($name != null) {
@@ -21,6 +27,40 @@ class ProductController extends Controller
         return response($products, 200)->header('Content-Type', 'application/json');
     }
 
+    /**
+     * Show Sorted Product
+     *
+     * @param string $name
+     * @param int $likes
+     * @return List|Product
+     */
+    public function sort($name = null, $likes = null)
+    {
+        $products = [];
+        if ($name != null) {
+            if ($likes != null) {
+                $products = DB::table('products')->orderBy('name', 'ASC')->orderBy('likes', 'ASC')->paginate(10);
+            } else {
+                $products = DB::table('products')->orderBy('name', 'ASC')->paginate(10);
+            }
+        } else {
+            if ($likes != null) {
+                $products = DB::table('products')->orderBy('likes', 'ASC')->paginate(10);
+            } else {
+                $products = DB::table('products')->paginate(10);
+            }
+         }
+        return response($products, 200)->header('Content-Type', 'application/json');
+    }
+
+    /**
+     * Add a Product
+     *
+     * If user is admin
+     * 
+     * @param string $request
+     * @return string
+     */
     public function store(Request $request)
     {
         try {
@@ -36,6 +76,14 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Delete a Product
+     *
+     * If user is admin
+     * 
+     * @param int $id
+     * @return string
+     */
     public function delete($id)
     {
         try {
@@ -56,6 +104,14 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Update a Product
+     *
+     * If user is admin
+     * 
+     * @param int $id
+     * @return string
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -67,7 +123,9 @@ class ProductController extends Controller
                 $product->update($request->all());
 
                 //Save Log Data
-                $log_data = "Controller ProductController. Action update. Data: $request";
+                $quantity = $request->input('quantity');
+                $price = $request->input('price');
+                $log_data = "Controller ProductController. Action update. Product id: $id, Quantity $quantity, Quantity $price";
                 Log::info($log_data);
                 $log_info = new LoggingInfo();
                 $log_info->user_id = auth()->guard('api')->user()->id;
@@ -75,7 +133,6 @@ class ProductController extends Controller
                 $log_info->description = "";
                 $log_info->data = $log_data;
                 $log_info->save();
-                Log::info($log_data);
 
                 return response("", 202)->header('Content-Type', 'application/json');
             }
@@ -87,6 +144,12 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Like a Product
+     *
+     * @param int $id
+     * @return string
+     */
     public function like($id)
     {
         try {
