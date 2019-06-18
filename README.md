@@ -58,6 +58,11 @@ In the Store-Api folder run the following command on the terminal for installing
 ```bash
 #composer install
 ```
+In the Client folder root run the following command on the terminal for installing the npm dependencies.
+
+```bash
+#npm install
+```
 
 ## Running the app
 
@@ -73,6 +78,15 @@ Navigate to the store-api folder run the following command on the terminal.
 There you will see the URL for you to test the app.
 
 http://127.0.0.1:8000
+
+Navigate to the client root folder run the following command on the terminal.
+
+```bash
+#npm start
+```
+There it will open a browser window with the angular app.
+
+http://localhost:4200/
 
 ## Testing
 
