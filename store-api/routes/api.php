@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 //Products Functionality
-Route::get('products/{name?}', 'ProductController@index');
+Route::get('products/{name?}', 'ProductController@index')->middleware('cors:api');;
 Route::get('products/sort/name={name?}&likes={likes?}', 'ProductController@sort');
 Route::put('products/like/{id}', 'ProductController@like')->middleware('auth:api');
 Route::post('products', 'ProductController@store')->middleware('auth:api');
