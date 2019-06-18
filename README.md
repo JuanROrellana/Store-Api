@@ -39,7 +39,7 @@ https://github.com/JuanROrellana/Store-Api
 Or Git clone the repository from the git bash and navigate to the Store-Api folder.
 
 ```bash
-#https://github.com/JuanROrellana/Store-Api.git
+#git clone https://github.com/JuanROrellana/Store-Api.git
 #cd Store-Api/
 ```
 
